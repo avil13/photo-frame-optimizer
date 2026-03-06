@@ -44,56 +44,55 @@ Place a `config.json` next to the script. All keys are optional — missing keys
 
 ```json
 {
-  "photo_dir": "./photos",
-  "extensions": [".jpg", ".jpeg", ".png", ".bmp", ".webp", ".tiff", ".tif"],
-  "width": 1200,
-  "height": 1600,
-  "num_colors": 6,
+  "photo_dir":        "./photos",
+  "extensions":       [".jpg", ".jpeg", ".png", ".bmp", ".webp", ".tiff", ".tif"],
+  "width":            1200,
+  "height":           1600,
+  "num_colors":       6,
   "dither_algorithm": "blue_noise",
-  "palette_mode": "adaptive",
+  "palette_mode":     "adaptive",
   "palette": [
-    [0, 0, 0],
+    [0,   0,   0  ],
     [255, 255, 255],
-    [255, 0, 0],
-    [0, 255, 0],
-    [0, 0, 255],
-    [255, 255, 0]
+    [255, 0,   0  ],
+    [0,   255, 0  ],
+    [0,   0,   255],
+    [255, 255, 0  ]
   ]
 }
 ```
 
 ### Config reference
 
-| Key                | Default        | Description                                                |
-| ------------------ | -------------- | ---------------------------------------------------------- |
-| `photo_dir`        | `./photos`     | Folder containing source images                            |
-| `extensions`       | common formats | File extensions to process                                 |
-| `width`            | `1200`         | Output width in pixels                                     |
-| `height`           | `1600`         | Output height in pixels                                    |
-| `num_colors`       | `6`            | Number of colors in output                                 |
-| `dither_algorithm` | `blue_noise`   | See algorithms below                                       |
-| `palette_mode`     | `adaptive`     | `adaptive` or `fixed`                                      |
-| `palette`          | 6 basic colors | Used only when `palette_mode` is `fixed`                   |
-| `sort_name`        | `false`        | If `true`, rename outputs to `image1.png`, `image2.png`, … |
+| Key | Default | Description |
+|---|---|---|
+| `photo_dir` | `./photos` | Folder containing source images |
+| `output_dir` | `""` | Output folder path; empty = `<photo_dir>/img/` |
+| `extensions` | common formats | File extensions to process |
+| `width` | `1200` | Output width in pixels |
+| `height` | `1600` | Output height in pixels |
+| `num_colors` | `6` | Number of colors in output |
+| `dither_algorithm` | `blue_noise` | See algorithms below |
+| `palette_mode` | `adaptive` | `adaptive` or `fixed` |
+| `palette` | 6 basic colors | Used only when `palette_mode` is `fixed` |
+| `sort_name` | `false` | If `true`, rename outputs to `01.png`, `02.png`, … |
+| `png_compression` | `6` | PNG compression level 0–9 (0 = fastest/largest, 9 = slowest/smallest) |
+| `png_optimize` | `true` | Extra compression pass — smaller files, slightly slower |
 
 ---
 
 ## Dithering Algorithms
 
 ### `blue_noise` ⭐ (default)
-
 Threshold dithering using a void-and-cluster blue-noise matrix. No error propagation means zero worm or streak artifacts. Most natural-looking result, especially with few colors.
 
 ### `ostromoukhov`
-
 Error diffusion with variable weights that change based on pixel luminance — darker pixels spread error more downward, brighter pixels more rightward. Near-optimal for classic diffusion. Reduces the banding common in fixed-weight algorithms.
 
 ### `jarvis`
-
 Jarvis-Judice-Ninke algorithm. Spreads error to 12 neighboring pixels (vs 4 in Floyd-Steinberg), producing smoother gradients. Good for images with large smooth areas like skies or skin.
 
 ### `floyd_steinberg`
-
 The classic. Fast and well-understood. With very few colors (≤6) can produce visible diagonal "worm" artifacts in smooth gradients. Best used when speed matters over quality.
 
 ---
@@ -101,11 +100,9 @@ The classic. Fast and well-understood. With very few colors (≤6) can produce v
 ## Palette Modes
 
 ### `adaptive` ⭐ (default)
-
 Runs k-means clustering on each image in linear RGB space to find the N colors that best represent that specific image. A forest photo gets greens and browns; a sunset gets oranges and purples. Produces the highest quality output.
 
 ### `fixed`
-
 Uses the color list in the `palette` config key. Useful for hardware targets with a fixed set of colors, such as 7-color e-ink displays.
 
 ---
@@ -124,12 +121,12 @@ Conversion back to sRGB happens after dithering.
 
 ## Algorithm Comparison
 
-| Algorithm         | Quality    | Speed      | Best for                     |
-| ----------------- | ---------- | ---------- | ---------------------------- |
-| `blue_noise`      | ⭐⭐⭐⭐⭐ | ⚡⚡⚡⚡   | Any image — default choice   |
-| `ostromoukhov`    | ⭐⭐⭐⭐   | ⚡⚡       | High detail, portraits       |
-| `jarvis`          | ⭐⭐⭐     | ⚡⚡       | Smooth gradients, landscapes |
-| `floyd_steinberg` | ⭐⭐       | ⚡⚡⚡⚡⚡ | Speed priority, many colors  |
+| Algorithm | Quality | Speed | Best for |
+|---|---|---|---|
+| `blue_noise` | ⭐⭐⭐⭐⭐ | ⚡⚡⚡⚡ | Any image — default choice |
+| `ostromoukhov` | ⭐⭐⭐⭐ | ⚡⚡ | High detail, portraits |
+| `jarvis` | ⭐⭐⭐ | ⚡⚡ | Smooth gradients, landscapes |
+| `floyd_steinberg` | ⭐⭐ | ⚡⚡⚡⚡⚡ | Speed priority, many colors |
 
 **Biggest quality win:** switch `palette_mode` from `fixed` to `adaptive`. Letting k-means pick the best colors per image makes a larger difference than any algorithm choice.
 

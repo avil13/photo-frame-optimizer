@@ -1,5 +1,8 @@
 {
+  "host": "http://192.168.1.1",
+
   "photo_dir": "./photos",
+  "output_dir": "./photos/img",
   "extensions": [".jpg", ".jpeg", ".png", ".bmp", ".webp", ".tiff", ".tif"],
   "width": 1200,
   "height": 1600,
@@ -16,5 +19,8 @@
     [0, 0, 255],
     [255, 255, 0]
   ],
-  "sort_name": true
+  "sort_name": true,
+
+  "png_compression": 8,
+  "png_optimize": true
 }

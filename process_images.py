@@ -51,7 +51,10 @@ DEFAULTS: dict = {
         [0,   0,   255],
         [255, 255, 0  ],
     ],
-    "sort_name": False,                 # if True, rename outputs to image1.png, image2.png, ...
+    "sort_name":       False,           # if True, rename outputs to 01.png, 02.png, ...
+    "output_dir":      "",              # output folder; empty = <photo_dir>/img/
+    "png_compression": 6,               # PNG compression 0-9 (0 = fastest/largest, 9 = smallest/slowest)
+    "png_optimize":    True,            # extra compression pass (slightly slower, smaller file)
 }
 
 CONFIG_FILE = Path(__file__).parent / "config.json"
@@ -370,19 +373,21 @@ def smart_crop(img: Image.Image, target_w: int, target_h: int) -> Image.Image:
 # ══════════════════════════════════════════════════════════════════════════════
 
 def process_folder(cfg: dict, folder: str) -> None:
-    src_dir   = Path(folder).resolve()
-    target_w  = cfg["width"]
-    target_h  = cfg["height"]
-    supported = set(cfg["extensions"])
-    algorithm = cfg["dither_algorithm"]
-    pal_mode  = cfg["palette_mode"]
-    n_colors  = cfg["num_colors"]
+    src_dir     = Path(folder).resolve()
+    target_w    = cfg["width"]
+    target_h    = cfg["height"]
+    supported   = set(cfg["extensions"])
+    algorithm   = cfg["dither_algorithm"]
+    pal_mode    = cfg["palette_mode"]
+    n_colors    = cfg["num_colors"]
+    png_comp    = int(cfg.get("png_compression", 6))
+    png_opt     = bool(cfg.get("png_optimize", True))
 
     if not src_dir.is_dir():
         print(f"❌  Not a directory: {src_dir}")
         sys.exit(1)
 
-    out_dir = src_dir / "img"
+    out_dir = Path(cfg["output_dir"]).resolve() if cfg.get("output_dir") else src_dir / "img"
     out_dir.mkdir(exist_ok=True)
 
     print(f"📂  Source    : {src_dir}")
@@ -390,6 +395,7 @@ def process_folder(cfg: dict, folder: str) -> None:
     print(f"📐  Size      : {target_w}×{target_h}")
     print(f"🎨  Palette   : {pal_mode} ({n_colors} colors)")
     print(f"🔀  Algorithm : {algorithm}")
+    print(f"💾  PNG       : compression={png_comp}  optimize={png_opt}")
     print(f"🔍  Exts      : {', '.join(sorted(supported))}\n")
 
     images = [p for p in src_dir.iterdir() if p.suffix.lower() in supported]
@@ -419,9 +425,10 @@ def process_folder(cfg: dict, folder: str) -> None:
                 result = dither(cropped, palette, algorithm)
 
                 pad = len(str(len(images)))
-                out_name = f"{str(i).zfill(pad)}.png" if sort_name else img_path.stem + ".png"
+                stem = str(i).zfill(pad) if sort_name else img_path.stem
+                out_name = stem + ".png"
                 out_path = out_dir / out_name
-                result.save(out_path, "PNG", optimize=True)
+                result.save(out_path, "PNG", compress_level=png_comp, optimize=png_opt)
                 kb = out_path.stat().st_size // 1024
                 print(f"  ✅ saved  → {out_name}  ({kb} KB)\n")
 
@@ -442,5 +449,3 @@ if __name__ == "__main__":
     cfg    = load_config()
     folder = sys.argv[1] if len(sys.argv) > 1 else cfg["photo_dir"]
     process_folder(cfg, folder)
-
-
