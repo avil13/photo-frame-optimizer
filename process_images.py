@@ -172,6 +172,6 @@ if __name__ == "__main__":
         target_w=cfg["width"],
         target_h=cfg["height"],
         supported=set(cfg["extensions"]),
-    )   process_folder(sys.argv[1])
+    )
 
 
