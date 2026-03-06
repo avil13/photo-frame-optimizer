@@ -51,6 +51,7 @@ DEFAULTS: dict = {
         [0,   0,   255],
         [255, 255, 0  ],
     ],
+    "sort_name": False,                 # if True, rename outputs to image1.png, image2.png, ...
 }
 
 CONFIG_FILE = Path(__file__).parent / "config.json"
@@ -400,6 +401,8 @@ def process_folder(cfg: dict, folder: str) -> None:
     if pal_mode == "fixed":
         fixed_palette = build_fixed_palette(cfg["palette"])
 
+    sort_name = cfg.get("sort_name", False)
+
     for i, img_path in enumerate(images, 1):
         print(f"[{i}/{len(images)}] {img_path.name}")
         try:
@@ -415,7 +418,8 @@ def process_folder(cfg: dict, folder: str) -> None:
 
                 result = dither(cropped, palette, algorithm)
 
-                out_name = img_path.stem + "_dithered.png"
+                pad = len(str(len(images)))
+                out_name = f"{str(i).zfill(pad)}.png" if sort_name else img_path.stem + ".png"
                 out_path = out_dir / out_name
                 result.save(out_path, "PNG", optimize=True)
                 kb = out_path.stat().st_size // 1024
@@ -438,4 +442,5 @@ if __name__ == "__main__":
     cfg    = load_config()
     folder = sys.argv[1] if len(sys.argv) > 1 else cfg["photo_dir"]
     process_folder(cfg, folder)
+
 

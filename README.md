@@ -64,16 +64,17 @@ Place a `config.json` next to the script. All keys are optional — missing keys
 
 ### Config reference
 
-| Key                | Default        | Description                              |
-| ------------------ | -------------- | ---------------------------------------- |
-| `photo_dir`        | `./photos`     | Folder containing source images          |
-| `extensions`       | common formats | File extensions to process               |
-| `width`            | `1200`         | Output width in pixels                   |
-| `height`           | `1600`         | Output height in pixels                  |
-| `num_colors`       | `6`            | Number of colors in output               |
-| `dither_algorithm` | `blue_noise`   | See algorithms below                     |
-| `palette_mode`     | `adaptive`     | `adaptive` or `fixed`                    |
-| `palette`          | 6 basic colors | Used only when `palette_mode` is `fixed` |
+| Key                | Default        | Description                                                |
+| ------------------ | -------------- | ---------------------------------------------------------- |
+| `photo_dir`        | `./photos`     | Folder containing source images                            |
+| `extensions`       | common formats | File extensions to process                                 |
+| `width`            | `1200`         | Output width in pixels                                     |
+| `height`           | `1600`         | Output height in pixels                                    |
+| `num_colors`       | `6`            | Number of colors in output                                 |
+| `dither_algorithm` | `blue_noise`   | See algorithms below                                       |
+| `palette_mode`     | `adaptive`     | `adaptive` or `fixed`                                      |
+| `palette`          | 6 basic colors | Used only when `palette_mode` is `fixed`                   |
+| `sort_name`        | `false`        | If `true`, rename outputs to `image1.png`, `image2.png`, … |
 
 ---
 
