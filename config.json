@@ -1,0 +1,6 @@
+{
+  "photo_dir": "./photos",
+  "extensions": [".jpg", ".jpeg", ".png", ".bmp", ".webp", ".tiff", ".tif"],
+  "width": 1200,
+  "height": 1600
+}
