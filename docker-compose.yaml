@@ -1,18 +1,26 @@
 services:
   send-photo:
     image: ghcr.io/astral-sh/uv:alpine3.23
+    container_name: photo_run
+    restart: unless-stopped
     working_dir: /app
     volumes:
       - .:/app
     command: uv run send_photo.py
     env_file:
       - .env
-    profiles: ["manual"] # It will start only if the profile is explicitly enabled. Cron runs it manually
+    # profiles: ["manual"] # It will start only if the profile is explicitly enabled. Cron runs it manually
 
   cron:
-    image: alpine:3.23
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: photo_cron
+    restart: unless-stopped
+    env_file:
+      - .env
     volumes:
       - .:/app
       - ./crontab:/etc/crontabs/root
+      - ./crontab:/var/spool/cron/crontabs/root
     working_dir: /app
-    command: crond -f
