@@ -24,8 +24,14 @@ Batch image processor that crops photos to a target size and reduces them to N c
 ## Usage
 
 ```bash
+# Copy and replace HOST ⚠️
+cp .env.example .env
+
 # Run with config.json or built-in defaults
 ./process_images.py
+
+# 👍 👍 👍
+# That's all, but there are other ways too.
 
 # Override the source folder via CLI
 ./process_images.py /path/to/your/photos
@@ -153,4 +159,13 @@ Conversion back to sRGB happens after dithering.
   🔵 generating blue-noise matrix… done
   dithering [████████████████████] 100% (blue-noise)
   ✅ saved  → sunset_dithered.png  (142 KB)
+```
+
+
+## Run send_photo.py in crone
+
+Edit `*/10 * * * *` - time int crontab file in repo and run:
+
+```sh
+docker compose up
 ```

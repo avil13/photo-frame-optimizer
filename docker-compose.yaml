@@ -1,0 +1,18 @@
+services:
+  send-photo:
+    image: ghcr.io/astral-sh/uv:alpine3.23
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: uv run send_photo.py
+    env_file:
+      - .env
+    profiles: ["manual"] # It will start only if the profile is explicitly enabled. Cron runs it manually
+
+  cron:
+    image: alpine:3.23
+    volumes:
+      - .:/app
+      - ./crontab:/etc/crontabs/root
+    working_dir: /app
+    command: crond -f

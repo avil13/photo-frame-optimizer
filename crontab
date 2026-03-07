@@ -1,0 +1,1 @@
+*/10 * * * * cd /app && docker compose run --rm send-photo
