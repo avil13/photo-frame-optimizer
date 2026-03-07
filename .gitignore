@@ -1,3 +1,4 @@
 photos/*
 !photos/.gitkeep
 .last_sent
+.env

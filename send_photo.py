@@ -5,6 +5,7 @@
 #     "requests",
 #     "Pillow",
 #     "numpy",
+#     "python-dotenv",
 # ]
 # ///
 
@@ -23,13 +24,16 @@ Each nibble is a palette index (0–N) matching the palette in config.json.
 """
 
 import json
+import os
 import sys
 import requests
 import numpy as np
 from pathlib import Path
 from PIL import Image
+from dotenv import load_dotenv
 
 CONFIG_PATH = Path(__file__).parent / "config.json"
+ENV_PATH    = Path(__file__).parent / ".env"
 CACHE_FILE  = ".last_sent"
 DEFAULT_EXTENSIONS = {".jpg", ".jpeg", ".png", ".bmp", ".webp"}
 
@@ -179,7 +183,14 @@ def send_photo(image_path: Path, config: dict, host: str) -> None:
 def main() -> None:
     config = load_config()
 
-    host = config.get("host").rstrip("/")
+    load_dotenv(ENV_PATH)
+    host = os.getenv("HOST")
+    if not host:
+        print(f"Error: HOST is not set.")
+        print(f"  Create a .env file at {ENV_PATH} with:")
+        print(f"    HOST=http://<your-esp32-ip>")
+        sys.exit(1)
+    host = host.rstrip("/")
 
     if len(sys.argv) > 1:
         folder = Path(sys.argv[1]).resolve()
