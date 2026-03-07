@@ -140,6 +140,23 @@ def process_image(image_path: Path, config: dict) -> bytes:
     return raw
 
 
+def check_host_available(host: str) -> None:
+    """Check that the ESP32 host is reachable before sending data."""
+    test_url = f"{host}/wifi"
+    print(f"Checking host availability at {test_url} ...")
+
+    try:
+        resp = requests.get(test_url, verify=False, timeout=5)
+    except requests.exceptions.RequestException as e:
+        print(f"Error: Cannot reach {test_url}")
+        print("  Make sure the device is powered on and on the same network.")
+        raise SystemExit(1) from e
+
+    if not resp.ok:
+        print(f"Error: Host responded with status {resp.status_code}")
+        raise SystemExit(1)
+
+
 def send_photo(image_path: Path, config: dict, host: str) -> None:
     print(f"Processing: {image_path.name}")
     raw_data = process_image(image_path, config)
@@ -166,7 +183,7 @@ def send_photo(image_path: Path, config: dict, host: str) -> None:
             server_url, files=files, headers=headers, verify=False, timeout=60,
         )
     except requests.exceptions.ConnectionError as e:
-        print(f"Error: Cannot connect to {SERVER_URL}")
+        print(f"Error: Cannot connect to {server_url}")
         print("  Make sure the device is powered on and on the same network.")
         raise SystemExit(1) from e
 
@@ -214,6 +231,7 @@ def main() -> None:
 
     photo = pick_next_photo(folder, photos)
     print(f"Sending: {photo.name} from {photo.parent}")
+    check_host_available(host)
     send_photo(photo, config, host)
     print("Done ✓")
 
